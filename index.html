@@ -3,1188 +3,797 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DriveShield - Seguros de Vehículos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --navy: #0B1F3A;
-      --navy-mid: #132d52;
-      --accent: #E8FF47;
-      --accent-dark: #c7db2e;
-      --white: #F5F5F0;
-      --gray: #8A8F98;
-      --gray-light: #E8E8E3;
-      --red-soft: #FF5A4E;
-      --card-bg: #111C2D;
-      --card-border: #1E3050;
-      --success: #3DCC7E;
-      --warning: #F5A623;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--navy);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 400;
-      overflow-x: hidden;
-    }
-
-    h1, h2, h3, h4, .logo-text { font-family: 'Syne', sans-serif; }
-
-    /* ──── NAVBAR ──── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 3rem;
-      background: rgba(11,31,58,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .logo-icon svg { width: 22px; height: 22px; }
-
-    .logo-text {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--white);
-      letter-spacing: -0.02em;
-    }
-
-    .logo-text span { color: var(--accent); }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 2rem;
-    }
-
-    nav ul a {
-      color: var(--gray);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-
-    nav ul a:hover, nav ul a.active { color: var(--white); }
-
-    .nav-actions { display: flex; gap: 0.75rem; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0.55rem 1.25rem;
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--card-border);
-      color: var(--white);
-    }
-
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-    .btn-accent {
-      background: var(--accent);
-      color: var(--navy);
-      font-weight: 700;
-    }
-
-    .btn-accent:hover { background: var(--accent-dark); transform: translateY(-1px); }
-
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-
-    .hamburger span {
-      display: block;
-      width: 24px; height: 2px;
-      background: var(--white);
-      border-radius: 2px;
-      transition: all 0.3s;
-    }
-
-    /* ──── PAGES (SPA) ──── */
-    .page { display: none; padding-top: 72px; min-height: 100vh; }
-    .page.active { display: block; }
-
-    /* ──── HERO ──── */
-    .hero {
-      position: relative;
-      overflow: hidden;
-      padding: 5rem 3rem 4rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: center;
-      min-height: calc(100vh - 72px);
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -200px; right: -200px;
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(232,255,71,0.12);
-      border: 1px solid rgba(232,255,71,0.3);
-      border-radius: 100px;
-      padding: 0.35rem 0.9rem;
-      font-size: 0.78rem;
-      color: var(--accent);
-      font-weight: 500;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero h1 span { color: var(--accent); }
-
-    .hero p {
-      color: var(--gray);
-      font-size: 1.05rem;
-      line-height: 1.75;
-      max-width: 480px;
-      margin-bottom: 2.5rem;
-    }
-
-    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-    .stats-row {
-      display: flex;
-      gap: 2rem;
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--card-border);
-    }
-
-    .stat-item h3 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--accent);
-    }
-
-    .stat-item p { font-size: 0.82rem; color: var(--gray); margin-top: 2px; }
-
-    .hero-visual {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .car-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 1.75rem;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .car-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1.5rem;
-    }
-
-    .car-card-header h4 { font-size: 1rem; font-weight: 600; }
-    .car-card-header p { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
-
-    .badge-active {
-      background: rgba(61,204,126,0.15);
-      color: var(--success);
-      border: 1px solid rgba(61,204,126,0.3);
-      border-radius: 100px;
-      padding: 4px 10px;
-      font-size: 0.72rem;
-      font-weight: 500;
-    }
-
-    .car-visual-box {
-      background: linear-gradient(135deg, #132d52, #0B1F3A);
-      border-radius: 12px;
-      height: 120px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1.25rem;
-      font-size: 3.5rem;
-    }
-
-    .car-info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .info-cell { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 0.65rem 0.75rem; }
-    .info-cell p { font-size: 0.72rem; color: var(--gray); margin-bottom: 2px; }
-    .info-cell h5 { font-size: 0.85rem; font-weight: 500; }
-
-    .progress-bar {
-      background: rgba(255,255,255,0.08);
-      border-radius: 100px;
-      height: 6px;
-      margin-top: 0.5rem;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: var(--accent);
-      width: 65%;
-    }
-
-    /* ──── SECTION COMMON ──── */
-    section { padding: 4rem 3rem; }
-
-    .section-label {
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    .section-title {
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 1rem;
-    }
-
-    .section-sub {
-      color: var(--gray);
-      max-width: 520px;
-      line-height: 1.7;
-      margin-bottom: 3rem;
-    }
-
-    /* ──── SERVICES ──── */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .service-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 1.75rem;
-      transition: border-color 0.2s, transform 0.2s;
-      cursor: pointer;
-    }
-
-    .service-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-
-    .service-icon {
-      width: 48px; height: 48px;
-      background: rgba(232,255,71,0.12);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
-
-    .service-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
-    .service-card p { font-size: 0.85rem; color: var(--gray); line-height: 1.65; }
-
-    /* ──── FORMS ──── */
-    .form-section {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 2.5rem;
-      max-width: 700px;
-    }
-
-    .form-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
-
-    .form-sub { font-size: 0.875rem; color: var(--gray); margin-bottom: 2rem; }
-
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-grid.full { grid-template-columns: 1fr; }
-
-    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-    .form-group.span2 { grid-column: span 2; }
-
-    .form-group label {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--gray);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 0.7rem 0.9rem;
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus { border-color: var(--accent); }
-
-    .form-group select option { background: var(--navy); }
-
-    .form-actions { margin-top: 1.75rem; display: flex; gap: 0.75rem; }
-
-    /* ──── TABLE ──── */
-    .table-wrapper {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    .table-header h3 { font-size: 1rem; font-weight: 600; }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 0.5rem 0.9rem;
-    }
-
-    .search-box input {
-      background: none;
-      border: none;
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem;
-      outline: none;
-      width: 200px;
-    }
-
-    .search-box input::placeholder { color: var(--gray); }
-
-    table { width: 100%; border-collapse: collapse; }
-    thead th {
-      padding: 0.75rem 1.5rem;
-      text-align: left;
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: var(--gray);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    tbody td {
-      padding: 0.9rem 1.5rem;
-      font-size: 0.875rem;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .badge {
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-size: 0.72rem;
-      font-weight: 500;
-    }
-
-    .badge-success { background: rgba(61,204,126,0.15); color: var(--success); }
-    .badge-warning { background: rgba(245,166,35,0.15); color: var(--warning); }
-    .badge-danger  { background: rgba(255,90,78,0.15);  color: var(--red-soft); }
-
-    /* ──── DASHBOARD ──── */
-    .dash-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .metric-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 1.4rem;
-    }
-
-    .metric-card p { font-size: 0.78rem; color: var(--gray); margin-bottom: 0.5rem; }
-    .metric-card h2 { font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
-    .metric-card small { font-size: 0.78rem; color: var(--success); }
-
-    /* ──── LOGIN ──── */
-    .login-wrap {
-      min-height: calc(100vh - 72px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .login-box {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 3rem;
-      width: 100%;
-      max-width: 440px;
-    }
-
-    .login-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 2rem;
-    }
-
-    .login-logo .logo-icon { width: 40px; height: 40px; }
-    .login-logo .logo-text { font-size: 1.5rem; }
-
-    .login-box h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .login-box p { font-size: 0.875rem; color: var(--gray); margin-bottom: 2rem; }
-
-    .alert {
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-    }
-
-    .alert-success { background: rgba(61,204,126,0.12); border: 1px solid rgba(61,204,126,0.3); color: var(--success); }
-    .alert-error   { background: rgba(255,90,78,0.12);  border: 1px solid rgba(255,90,78,0.3);  color: var(--red-soft); }
-
-    /* ──── TOAST ──── */
-    .toast {
-      position: fixed;
-      bottom: 2rem; right: 2rem;
-      background: var(--card-bg);
-      border: 1px solid var(--success);
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.875rem;
-      color: var(--success);
-      z-index: 200;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.35s;
-    }
-
-    .toast.show { transform: translateY(0); opacity: 1; }
-
-    /* ──── FOOTER ──── */
-    footer {
-      background: var(--card-bg);
-      border-top: 1px solid var(--card-border);
-      padding: 2.5rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    footer p { font-size: 0.82rem; color: var(--gray); }
-
-    /* ──── RESPONSIVE ──── */
-    @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
-      .hero-visual { display: none; }
-      nav { padding: 1rem 1.5rem; }
-      nav ul { display: none; }
-      .hamburger { display: flex; }
-      .dash-grid { grid-template-columns: repeat(2, 1fr); }
-      section { padding: 3rem 1.5rem; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.span2 { grid-column: span 1; }
-      footer { flex-direction: column; text-align: center; }
-    }
-
-    @media (max-width: 500px) {
-      .dash-grid { grid-template-columns: 1fr 1fr; }
-      .login-box { padding: 2rem 1.5rem; }
-    }
-  </style>
+  <title>DriverShield — Sistema de Seguros</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-<!-- ════════════════════ NAVBAR ════════════════════ -->
-<nav id="navbar">
-  <a href="#" class="logo" onclick="showPage('home')">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 12L5 6h14l2 6M3 12v5h2v2h2v-2h10v2h2v-2h2v-5H3z" stroke="#0B1F3A" stroke-width="1.8" stroke-linejoin="round"/>
-        <circle cx="7.5" cy="14.5" r="1.5" fill="#0B1F3A"/>
-        <circle cx="16.5" cy="14.5" r="1.5" fill="#0B1F3A"/>
-      </svg>
-    </div>
-    <span class="logo-text">Drive<span>Shield</span></span>
-  </a>
-
-  <ul id="nav-menu">
-    <li><a href="#" onclick="showPage('home')" id="nav-home" class="active">Inicio</a></li>
-    <li><a href="#" onclick="showPage('clientes')" id="nav-clientes">Clientes</a></li>
-    <li><a href="#" onclick="showPage('vehiculos')" id="nav-vehiculos">Vehículos</a></li>
-    <li><a href="#" onclick="showPage('polizas')" id="nav-polizas">Pólizas</a></li>
-    <li><a href="#" onclick="showPage('pagos')" id="nav-pagos">Pagos</a></li>
-    <li><a href="#" onclick="showPage('reportes')" id="nav-reportes">Reportes</a></li>
-  </ul>
-
-  <div class="nav-actions">
-    <button class="btn btn-outline" onclick="showPage('login')">Iniciar sesión</button>
-    <button class="btn btn-accent" onclick="showPage('clientes')">Nuevo cliente</button>
-  </div>
-
-  <button class="hamburger" id="hamburger">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<!-- ════════════════════ PAGE: HOME ════════════════════ -->
-<div class="page active" id="page-home">
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-content">
-      <div class="hero-badge">🛡️ Cobertura para todo tipo de vehículo</div>
-      <h1>Protege lo que más<br>usas, con <span>DriveShield</span></h1>
-      <p>Seguros de vehículos confiables para autos, motos, camiones, y más. Cotiza, registra y gestiona tus pólizas en minutos desde cualquier lugar.</p>
-      <div class="hero-actions">
-        <button class="btn btn-accent" onclick="showPage('polizas')">Registrar póliza</button>
-        <button class="btn btn-outline" onclick="showPage('clientes')">Ver clientes</button>
-      </div>
-      <div class="stats-row">
-        <div class="stat-item"><h3>2,400+</h3><p>Pólizas activas</p></div>
-        <div class="stat-item"><h3>98%</h3><p>Clientes satisfechos</p></div>
-        <div class="stat-item"><h3>24/7</h3><p>Disponibilidad</p></div>
-      </div>
+  <!-- ===================== AUTH SCREEN ===================== -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-bg">
+      <div class="auth-bg-orb orb1"></div>
+      <div class="auth-bg-orb orb2"></div>
+      <div class="auth-bg-grid"></div>
     </div>
 
-    <div class="hero-visual">
-      <div class="car-card">
-        <div class="car-card-header">
-          <div>
-            <h4>Toyota Corolla 2022</h4>
-            <p>Placa: ABC-123 • Auto</p>
-          </div>
-          <span class="badge-active">Activa</span>
-        </div>
-        <div class="car-visual-box">🚗</div>
-        <div class="car-info-grid">
-          <div class="info-cell"><p>Propietario</p><h5>Juan Pérez</h5></div>
-          <div class="info-cell"><p>Tipo póliza</p><h5>Todo riesgo</h5></div>
-          <div class="info-cell"><p>Vence</p><h5>Mar 2026</h5></div>
-          <div class="info-cell"><p>Cuota mensual</p><h5>$180.000</h5></div>
-        </div>
+    <div class="auth-left">
+      <div class="auth-brand">
+        <div class="brand-icon">DS</div>
         <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-            <span style="font-size:0.75rem;color:var(--gray)">Vigencia de la póliza</span>
-            <span style="font-size:0.75rem;font-weight:500">65%</span>
+          <div class="brand-name" style="font-size:20px">DriverShield</div>
+          <div class="brand-sub">Sistema de Seguros Vehiculares</div>
+        </div>
+      </div>
+      <div class="auth-hero">
+        <h1 class="auth-hero-title">Gestiona tus<br/><span class="auth-hero-accent">seguros</span><br/>con confianza.</h1>
+        <p class="auth-hero-desc">Clientes, vehículos, pólizas y pagos en un solo lugar. Seguro, rápido y siempre disponible.</p>
+        <div class="auth-features">
+          <div class="auth-feat"><span class="auth-feat-icon">◈</span> Dashboard en tiempo real</div>
+          <div class="auth-feat"><span class="auth-feat-icon">◐</span> Gestión de pólizas</div>
+          <div class="auth-feat"><span class="auth-feat-icon">◑</span> Historial de pagos</div>
+          <div class="auth-feat"><span class="auth-feat-icon">◔</span> Reportes automáticos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-card" id="auth-card">
+
+        <!-- LOGIN -->
+        <div class="auth-tab-view active" id="view-login">
+          <div class="auth-card-header">
+            <h2>Iniciar Sesión</h2>
+            <p>Accede a tu cuenta de DriverShield</p>
           </div>
-          <div class="progress-bar"><div class="progress-fill"></div></div>
+          <div class="auth-form">
+            <div class="form-group">
+              <label>Correo electrónico</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">✉</span>
+                <input type="email" id="login-email" placeholder="correo@ejemplo.com" onkeydown="if(event.key==='Enter') doLogin()" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Contraseña</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">⚿</span>
+                <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()" />
+                <button class="toggle-pass" onclick="togglePass('login-password', this)" tabindex="-1">👁</button>
+              </div>
+            </div>
+            <div id="login-error" class="auth-error"></div>
+            <button class="btn btn-primary btn-full" onclick="doLogin()">Ingresar al Sistema</button>
+            <div class="auth-divider"><span>¿No tienes cuenta?</span></div>
+            <button class="btn btn-ghost btn-full" onclick="switchAuthView('register')">Crear cuenta nueva</button>
+          </div>
         </div>
+
+        <!-- REGISTRO -->
+        <div class="auth-tab-view" id="view-register">
+          <div class="auth-card-header">
+            <h2>Crear Cuenta</h2>
+            <p>Regístrate para acceder al sistema</p>
+          </div>
+          <div class="auth-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre *</label>
+                <input type="text" id="reg-nombre" placeholder="Tu nombre" />
+              </div>
+              <div class="form-group">
+                <label>Apellido *</label>
+                <input type="text" id="reg-apellido" placeholder="Tu apellido" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Correo electrónico *</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">✉</span>
+                <input type="email" id="reg-email" placeholder="correo@ejemplo.com" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Contraseña *</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">⚿</span>
+                <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" />
+                <button class="toggle-pass" onclick="togglePass('reg-password', this)" tabindex="-1">👁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Confirmar Contraseña *</label>
+              <div class="input-icon-wrap">
+                <span class="input-icon">⚿</span>
+                <input type="password" id="reg-password2" placeholder="Repite tu contraseña" onkeydown="if(event.key==='Enter') doRegister()" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Rol</label>
+              <select id="reg-rol">
+                <option value="agente">Agente de Seguros</option>
+                <option value="admin">Administrador</option>
+                <option value="consultor">Consultor</option>
+              </select>
+            </div>
+            <div id="reg-error" class="auth-error"></div>
+            <button class="btn btn-primary btn-full" onclick="doRegister()">Registrarme</button>
+            <div class="auth-divider"><span>¿Ya tienes cuenta?</span></div>
+            <button class="btn btn-ghost btn-full" onclick="switchAuthView('login')">Iniciar sesión</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <!-- SERVICIOS -->
-  <section>
-    <div class="section-label">Funcionalidades</div>
-    <h2 class="section-title">Todo lo que necesitas en un solo sistema</h2>
-    <p class="section-sub">DriveShield cubre cada parte del proceso: desde el registro del cliente hasta los reportes de pólizas activas.</p>
+  <!-- APP WRAPPER (oculto hasta login) -->
+  <div id="app-wrapper" style="display:none">
 
-    <div class="services-grid">
-      <div class="service-card" onclick="showPage('clientes')">
-        <div class="service-icon">👤</div>
-        <h3>Registro de clientes</h3>
-        <p>Registra y consulta la información completa de cada cliente con su historial de seguros.</p>
-      </div>
-      <div class="service-card" onclick="showPage('vehiculos')">
-        <div class="service-icon">🚗</div>
-        <h3>Gestión de vehículos</h3>
-        <p>Registra autos, motos, camiones, buses y todo tipo de vehículo asegurado.</p>
-      </div>
-      <div class="service-card" onclick="showPage('polizas')">
-        <div class="service-icon">📋</div>
-        <h3>Pólizas de seguros</h3>
-        <p>Crea, consulta y renueva pólizas de forma sencilla y sin complicaciones.</p>
-      </div>
-      <div class="service-card" onclick="showPage('pagos')">
-        <div class="service-icon">💳</div>
-        <h3>Registro de pagos</h3>
-        <p>Lleva el control de todos los pagos realizados por cada cliente de forma ordenada.</p>
-      </div>
-      <div class="service-card" onclick="showPage('reportes')">
-        <div class="service-icon">📊</div>
-        <h3>Reportes</h3>
-        <p>Genera reportes de pólizas activas y consulta el historial de seguros por cliente.</p>
-      </div>
-      <div class="service-card" onclick="showPage('login')">
-        <div class="service-icon">🔒</div>
-        <h3>Acceso seguro</h3>
-        <p>Sistema protegido con usuario y contraseña para proteger la información.</p>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">DS</div>
+      <div class="brand-text">
+        <span class="brand-name">DriverShield</span>
+        <span class="brand-sub">Seguros Vehiculares</span>
       </div>
     </div>
-  </section>
-</div>
 
-<!-- ════════════════════ PAGE: LOGIN ════════════════════ -->
-<div class="page" id="page-login">
-  <div class="login-wrap">
-    <div class="login-box">
-      <div class="login-logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 12L5 6h14l2 6M3 12v5h2v2h2v-2h10v2h2v-2h2v-5H3z" stroke="#0B1F3A" stroke-width="1.8" stroke-linejoin="round"/>
-            <circle cx="7.5" cy="14.5" r="1.5" fill="#0B1F3A"/>
-            <circle cx="16.5" cy="14.5" r="1.5" fill="#0B1F3A"/>
-          </svg>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+        <span class="nav-icon">◈</span> Dashboard
+      </a>
+
+      <div class="nav-section-label">Registros</div>
+      <a class="nav-item" data-section="clientes" onclick="showSection('clientes')">
+        <span class="nav-icon">◉</span> Clientes
+      </a>
+      <a class="nav-item" data-section="vehiculos" onclick="showSection('vehiculos')">
+        <span class="nav-icon">◎</span> Vehículos
+      </a>
+      <a class="nav-item" data-section="polizas" onclick="showSection('polizas')">
+        <span class="nav-icon">◐</span> Pólizas
+      </a>
+      <a class="nav-item" data-section="pagos" onclick="showSection('pagos')">
+        <span class="nav-icon">◑</span> Pagos
+      </a>
+
+      <div class="nav-section-label">Consultas</div>
+      <a class="nav-item" data-section="consultas" onclick="showSection('consultas')">
+        <span class="nav-icon">◒</span> Consultar Info
+      </a>
+      <a class="nav-item" data-section="historial" onclick="showSection('historial')">
+        <span class="nav-icon">◓</span> Historial
+      </a>
+
+      <div class="nav-section-label">Reportes</div>
+      <a class="nav-item" data-section="reportes" onclick="showSection('reportes')">
+        <span class="nav-icon">◔</span> Reportes
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-user">
+        <div class="user-avatar" id="sidebar-avatar">A</div>
+        <div style="flex:1;min-width:0">
+          <div class="user-name" id="sidebar-username">Administrador</div>
+          <div class="user-role" id="sidebar-userrole">Sistema</div>
         </div>
-        <span class="logo-text">Drive<span>Shield</span></span>
+        <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">⏻</button>
       </div>
-      <h2>Bienvenido de vuelta</h2>
-      <p>Ingresa tus credenciales para continuar</p>
-
-      <div id="login-error" class="alert alert-error" style="display:none"></div>
-
-      <div class="form-group" style="margin-bottom:1rem">
-        <label>Usuario</label>
-        <input type="text" id="login-user" placeholder="admin@driveshield.com" />
-      </div>
-      <div class="form-group" style="margin-bottom:1.75rem">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" placeholder="••••••••" />
-      </div>
-
-      <button class="btn btn-accent" style="width:100%;justify-content:center;padding:0.8rem" onclick="doLogin()">
-        Iniciar sesión
-      </button>
-
-      <p style="text-align:center;margin-top:1rem;font-size:0.82rem;color:var(--gray)">
-        Demo: usuario <strong style="color:var(--white)">admin</strong> / contraseña <strong style="color:var(--white)">1234</strong>
-      </p>
     </div>
-  </div>
-</div>
+  </aside>
 
-<!-- ════════════════════ PAGE: CLIENTES ════════════════════ -->
-<div class="page" id="page-clientes">
-  <section>
-    <div class="section-label">Módulo</div>
-    <h2 class="section-title">Gestión de Clientes</h2>
-    <p class="section-sub">Registra nuevos clientes y consulta la información de los existentes.</p>
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main">
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;flex-wrap:wrap">
-
-      <!-- FORMULARIO -->
-      <div class="form-section">
-        <h3 class="form-title">Registrar cliente</h3>
-        <p class="form-sub">Completa los datos del nuevo asegurado</p>
-        <div class="form-grid">
-          <div class="form-group"><label>Nombre</label><input type="text" placeholder="Juan" id="c-nombre"/></div>
-          <div class="form-group"><label>Apellido</label><input type="text" placeholder="Pérez" id="c-apellido"/></div>
-          <div class="form-group"><label>Cédula / ID</label><input type="text" placeholder="1000123456" id="c-cedula"/></div>
-          <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="c-fecha"/></div>
-          <div class="form-group span2"><label>Correo electrónico</label><input type="email" placeholder="juan@correo.com" id="c-email"/></div>
-          <div class="form-group"><label>Teléfono</label><input type="tel" placeholder="300 000 0000" id="c-tel"/></div>
-          <div class="form-group"><label>Ciudad</label><input type="text" placeholder="Medellín" id="c-ciudad"/></div>
-          <div class="form-group span2"><label>Dirección</label><input type="text" placeholder="Calle 10 # 20-30" id="c-dir"/></div>
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbarDate"></div>
+        <div class="topbar-badge">v1.0</div>
+        <div class="topbar-user" onclick="toggleUserMenu()">
+          <div class="topbar-avatar" id="topbar-avatar">A</div>
+          <span class="topbar-uname" id="topbar-uname">Admin</span>
+          <span style="font-size:10px;color:var(--text-muted)">▾</span>
+          <div class="user-dropdown" id="user-dropdown">
+            <div class="user-dropdown-info">
+              <div id="dd-name" style="font-weight:600;font-size:13px"></div>
+              <div id="dd-email" style="font-size:11px;color:var(--text-muted)"></div>
+              <div id="dd-rol" class="dd-rol-badge"></div>
+            </div>
+            <hr style="border-color:var(--border);margin:8px 0"/>
+            <button class="dd-item" onclick="doLogout()">⏻ Cerrar Sesión</button>
+          </div>
         </div>
-        <div class="form-actions">
-          <button class="btn btn-accent" onclick="registrarCliente()">Guardar cliente</button>
-          <button class="btn btn-outline" onclick="limpiarForm(['c-nombre','c-apellido','c-cedula','c-fecha','c-email','c-tel','c-ciudad','c-dir'])">Limpiar</button>
+      </div>
+    </header>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section class="section active" id="section-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" id="stat-clientes">
+          <div class="stat-icon">◉</div>
+          <div class="stat-value" id="dash-clientes">0</div>
+          <div class="stat-label">Clientes Registrados</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:0%" id="bar-clientes"></div></div>
+        </div>
+        <div class="stat-card" id="stat-vehiculos">
+          <div class="stat-icon">◎</div>
+          <div class="stat-value" id="dash-vehiculos">0</div>
+          <div class="stat-label">Vehículos Registrados</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:0%" id="bar-vehiculos"></div></div>
+        </div>
+        <div class="stat-card accent" id="stat-polizas">
+          <div class="stat-icon">◐</div>
+          <div class="stat-value" id="dash-polizas">0</div>
+          <div class="stat-label">Pólizas Activas</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:0%" id="bar-polizas"></div></div>
+        </div>
+        <div class="stat-card" id="stat-pagos">
+          <div class="stat-icon">◑</div>
+          <div class="stat-value" id="dash-pagos">$0</div>
+          <div class="stat-label">Total Recaudado</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:70%" id="bar-pagos"></div></div>
         </div>
       </div>
 
-      <!-- TABLA -->
+      <div class="dashboard-grid">
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <span>Pólizas Recientes</span>
+            <button class="btn-link" onclick="showSection('polizas')">Ver todas →</button>
+          </div>
+          <div id="dash-polizas-list" class="dash-list">
+            <div class="empty-state small">No hay pólizas registradas</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <span>Próximas a Vencer</span>
+            <span class="badge-warn" id="vencen-badge">0</span>
+          </div>
+          <div id="dash-vencen-list" class="dash-list">
+            <div class="empty-state small">Sin pólizas próximas a vencer</div>
+          </div>
+        </div>
+        <div class="dash-card wide">
+          <div class="dash-card-header">
+            <span>Últimos Pagos</span>
+            <button class="btn-link" onclick="showSection('pagos')">Ver todos →</button>
+          </div>
+          <div id="dash-pagos-list" class="dash-list">
+            <div class="empty-state small">No hay pagos registrados</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CLIENTES ===================== -->
+    <section class="section" id="section-clientes">
+      <div class="section-header">
+        <h2>Gestión de Clientes</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-cliente')">+ Nuevo Cliente</button>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="search-clientes" placeholder="Buscar por nombre, cédula o email…" oninput="renderClientes()" />
+        <span class="search-icon">⌕</span>
+      </div>
+
       <div class="table-wrapper">
-        <div class="table-header">
-          <h3>Clientes registrados</h3>
-          <div class="search-box">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="var(--gray)" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="var(--gray)" stroke-width="2"/></svg>
-            <input type="text" placeholder="Buscar..." oninput="filtrarTabla(this,'tabla-clientes')"/>
-          </div>
-        </div>
-        <table id="tabla-clientes">
-          <thead><tr><th>Nombre</th><th>Cédula</th><th>Ciudad</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr><td>Ana Gómez</td><td>1001234567</td><td>Bogotá</td><td><span class="badge badge-success">Activo</span></td></tr>
-            <tr><td>Luis Torres</td><td>1009876543</td><td>Medellín</td><td><span class="badge badge-success">Activo</span></td></tr>
-            <tr><td>María Ruiz</td><td>1002345678</td><td>Cali</td><td><span class="badge badge-warning">Pendiente</span></td></tr>
+        <table class="data-table" id="table-clientes">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Cédula / NIT</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Ciudad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-clientes">
+            <tr><td colspan="7" class="empty-td">No hay clientes registrados</td></tr>
           </tbody>
         </table>
       </div>
+    </section>
+
+    <!-- ===================== VEHÍCULOS ===================== -->
+    <section class="section" id="section-vehiculos">
+      <div class="section-header">
+        <h2>Gestión de Vehículos</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-vehiculo')">+ Nuevo Vehículo</button>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="search-vehiculos" placeholder="Buscar por placa, marca o propietario…" oninput="renderVehiculos()" />
+        <span class="search-icon">⌕</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Placa</th>
+              <th>Marca / Modelo</th>
+              <th>Año</th>
+              <th>Tipo</th>
+              <th>Propietario</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-vehiculos">
+            <tr><td colspan="7" class="empty-td">No hay vehículos registrados</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== PÓLIZAS ===================== -->
+    <section class="section" id="section-polizas">
+      <div class="section-header">
+        <h2>Gestión de Pólizas</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-poliza')">+ Nueva Póliza</button>
+      </div>
+
+      <div class="filter-row">
+        <input type="text" id="search-polizas" placeholder="Buscar por número o cliente…" oninput="renderPolizas()" />
+        <select id="filter-poliza-estado" onchange="renderPolizas()">
+          <option value="">Todos los estados</option>
+          <option value="Activa">Activa</option>
+          <option value="Vencida">Vencida</option>
+          <option value="Cancelada">Cancelada</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#Póliza</th>
+              <th>Cliente</th>
+              <th>Vehículo</th>
+              <th>Tipo</th>
+              <th>Inicio</th>
+              <th>Vencimiento</th>
+              <th>Prima</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-polizas">
+            <tr><td colspan="9" class="empty-td">No hay pólizas registradas</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== PAGOS ===================== -->
+    <section class="section" id="section-pagos">
+      <div class="section-header">
+        <h2>Registro de Pagos</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-pago')">+ Registrar Pago</button>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="search-pagos" placeholder="Buscar por póliza o cliente…" oninput="renderPagos()" />
+        <span class="search-icon">⌕</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#Pago</th>
+              <th>Póliza</th>
+              <th>Cliente</th>
+              <th>Monto</th>
+              <th>Fecha</th>
+              <th>Método</th>
+              <th>Concepto</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-pagos">
+            <tr><td colspan="7" class="empty-td">No hay pagos registrados</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== CONSULTAS ===================== -->
+    <section class="section" id="section-consultas">
+      <div class="section-header">
+        <h2>Consultar Información</h2>
+      </div>
+
+      <div class="consulta-grid">
+        <div class="consulta-card">
+          <h3>Buscar Cliente</h3>
+          <div class="form-group">
+            <label>Cédula / NIT o Nombre</label>
+            <input type="text" id="consulta-cliente-q" placeholder="Ingrese cédula o nombre…" />
+          </div>
+          <button class="btn btn-primary" onclick="consultarCliente()">Buscar</button>
+          <div id="consulta-cliente-result" class="consulta-result"></div>
+        </div>
+
+        <div class="consulta-card">
+          <h3>Buscar Vehículo</h3>
+          <div class="form-group">
+            <label>Placa o Propietario</label>
+            <input type="text" id="consulta-vehiculo-q" placeholder="Ingrese placa o propietario…" />
+          </div>
+          <button class="btn btn-primary" onclick="consultarVehiculo()">Buscar</button>
+          <div id="consulta-vehiculo-result" class="consulta-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HISTORIAL ===================== -->
+    <section class="section" id="section-historial">
+      <div class="section-header">
+        <h2>Historial de Seguros por Cliente</h2>
+      </div>
+
+      <div class="historial-search">
+        <select id="historial-cliente-sel">
+          <option value="">— Seleccione un cliente —</option>
+        </select>
+        <button class="btn btn-primary" onclick="verHistorial()">Ver Historial</button>
+      </div>
+
+      <div id="historial-result" class="historial-result">
+        <div class="empty-state">Seleccione un cliente para ver su historial de seguros</div>
+      </div>
+    </section>
+
+    <!-- ===================== REPORTES ===================== -->
+    <section class="section" id="section-reportes">
+      <div class="section-header">
+        <h2>Reportes</h2>
+        <button class="btn btn-outline" onclick="imprimirReporte()">⎙ Imprimir</button>
+      </div>
+
+      <div class="reporte-tabs">
+        <button class="tab-btn active" onclick="setReporteTab('activas', this)">Pólizas Activas</button>
+        <button class="tab-btn" onclick="setReporteTab('vencidas', this)">Pólizas Vencidas</button>
+        <button class="tab-btn" onclick="setReporteTab('pagos', this)">Reporte de Pagos</button>
+        <button class="tab-btn" onclick="setReporteTab('clientes', this)">Clientes</button>
+      </div>
+
+      <div id="reporte-container" class="reporte-container">
+        <!-- se llena con JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== MODALES ===================== -->
+
+  <!-- Modal Cliente -->
+  <div class="modal-overlay" id="modal-cliente">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-cliente-title">Registrar Cliente</h3>
+        <button class="modal-close" onclick="closeModal('modal-cliente')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="cliente-edit-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre Completo *</label>
+            <input type="text" id="cliente-nombre" placeholder="Ej. Juan Pérez" />
+          </div>
+          <div class="form-group">
+            <label>Cédula / NIT *</label>
+            <input type="text" id="cliente-cedula" placeholder="Ej. 12345678" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Teléfono *</label>
+            <input type="text" id="cliente-telefono" placeholder="Ej. 3001234567" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="cliente-email" placeholder="correo@ejemplo.com" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ciudad</label>
+            <input type="text" id="cliente-ciudad" placeholder="Ej. Montería" />
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" id="cliente-direccion" placeholder="Calle, carrera…" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Fecha de Nacimiento</label>
+          <input type="date" id="cliente-fecha-nac" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-cliente')">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarCliente()">Guardar Cliente</button>
+      </div>
     </div>
-  </section>
-</div>
+  </div>
 
-<!-- ════════════════════ PAGE: VEHÍCULOS ════════════════════ -->
-<div class="page" id="page-vehiculos">
-  <section>
-    <div class="section-label">Módulo</div>
-    <h2 class="section-title">Gestión de Vehículos</h2>
-    <p class="section-sub">Registra y consulta todos los vehículos asegurados: autos, motos, camiones, buses y más.</p>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
-      <div class="form-section">
-        <h3 class="form-title">Registrar vehículo</h3>
-        <p class="form-sub">Ingresa los datos del vehículo a asegurar</p>
-        <div class="form-grid">
-          <div class="form-group"><label>Placa</label><input type="text" placeholder="ABC-123" id="v-placa"/></div>
-          <div class="form-group"><label>Tipo de vehículo</label>
-            <select id="v-tipo">
-              <option value="">Seleccionar...</option>
+  <!-- Modal Vehículo -->
+  <div class="modal-overlay" id="modal-vehiculo">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-vehiculo-title">Registrar Vehículo</h3>
+        <button class="modal-close" onclick="closeModal('modal-vehiculo')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="vehiculo-edit-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>Placa *</label>
+            <input type="text" id="vehiculo-placa" placeholder="Ej. ABC123" maxlength="7" style="text-transform:uppercase" />
+          </div>
+          <div class="form-group">
+            <label>Propietario *</label>
+            <select id="vehiculo-propietario">
+              <option value="">— Seleccione cliente —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Marca *</label>
+            <input type="text" id="vehiculo-marca" placeholder="Ej. Toyota" />
+          </div>
+          <div class="form-group">
+            <label>Modelo *</label>
+            <input type="text" id="vehiculo-modelo" placeholder="Ej. Corolla" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Año *</label>
+            <input type="number" id="vehiculo-anio" placeholder="Ej. 2020" min="1980" max="2030" />
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="vehiculo-tipo">
               <option>Automóvil</option>
-              <option>Motocicleta</option>
               <option>Camioneta</option>
+              <option>Motocicleta</option>
               <option>Camión</option>
               <option>Bus</option>
-              <option>Taxi</option>
-              <option>Vehículo eléctrico</option>
               <option>Otro</option>
             </select>
           </div>
-          <div class="form-group"><label>Marca</label><input type="text" placeholder="Toyota" id="v-marca"/></div>
-          <div class="form-group"><label>Modelo</label><input type="text" placeholder="Corolla" id="v-modelo"/></div>
-          <div class="form-group"><label>Año</label><input type="number" placeholder="2022" id="v-year" min="1990" max="2026"/></div>
-          <div class="form-group"><label>Color</label><input type="text" placeholder="Blanco" id="v-color"/></div>
-          <div class="form-group span2"><label>Número de chasis</label><input type="text" placeholder="1HGBH41JXMN109186" id="v-chasis"/></div>
-          <div class="form-group span2"><label>Propietario (Cédula)</label><input type="text" placeholder="1001234567" id="v-prop"/></div>
         </div>
-        <div class="form-actions">
-          <button class="btn btn-accent" onclick="registrarVehiculo()">Guardar vehículo</button>
-          <button class="btn btn-outline" onclick="limpiarForm(['v-placa','v-marca','v-modelo','v-year','v-color','v-chasis','v-prop'])">Limpiar</button>
-        </div>
-      </div>
-
-      <div class="table-wrapper">
-        <div class="table-header">
-          <h3>Vehículos registrados</h3>
-          <div class="search-box">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="var(--gray)" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="var(--gray)" stroke-width="2"/></svg>
-            <input type="text" placeholder="Buscar..." oninput="filtrarTabla(this,'tabla-vehiculos')"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" id="vehiculo-color" placeholder="Ej. Blanco" />
+          </div>
+          <div class="form-group">
+            <label>No. Chasis / VIN</label>
+            <input type="text" id="vehiculo-vin" placeholder="Ej. 1HGBH41JXMN109186" />
           </div>
         </div>
-        <table id="tabla-vehiculos">
-          <thead><tr><th>Placa</th><th>Tipo</th><th>Marca / Modelo</th><th>Año</th></tr></thead>
-          <tbody>
-            <tr><td>ABC-123</td><td>Automóvil</td><td>Toyota Corolla</td><td>2022</td></tr>
-            <tr><td>XYZ-789</td><td>Motocicleta</td><td>Honda CBR</td><td>2021</td></tr>
-            <tr><td>DEF-456</td><td>Camioneta</td><td>Ford Explorer</td><td>2020</td></tr>
-          </tbody>
-        </table>
+        <div class="form-group">
+          <label>Valor Comercial (COP)</label>
+          <input type="number" id="vehiculo-valor" placeholder="Ej. 50000000" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-vehiculo')">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarVehiculo()">Guardar Vehículo</button>
       </div>
     </div>
-  </section>
-</div>
+  </div>
 
-<!-- ════════════════════ PAGE: PÓLIZAS ════════════════════ -->
-<div class="page" id="page-polizas">
-  <section>
-    <div class="section-label">Módulo</div>
-    <h2 class="section-title">Pólizas de Seguros</h2>
-    <p class="section-sub">Registra nuevas pólizas, renuévalas y consulta el estado de cada una.</p>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
-      <div class="form-section">
-        <h3 class="form-title">Registrar póliza</h3>
-        <p class="form-sub">Vincula una póliza a un cliente y vehículo</p>
-        <div class="form-grid">
-          <div class="form-group span2"><label>Número de póliza</label><input type="text" placeholder="POL-2024-001" id="p-num"/></div>
-          <div class="form-group span2"><label>Cliente (Cédula)</label><input type="text" placeholder="1001234567" id="p-cliente"/></div>
-          <div class="form-group span2"><label>Placa del vehículo</label><input type="text" placeholder="ABC-123" id="p-placa"/></div>
-          <div class="form-group"><label>Tipo de cobertura</label>
-            <select id="p-tipo">
-              <option value="">Seleccionar...</option>
-              <option>Todo riesgo</option>
-              <option>Básico SOAT</option>
-              <option>Responsabilidad civil</option>
-              <option>Pérdida total</option>
-              <option>Cobertura ampliada</option>
+  <!-- Modal Póliza -->
+  <div class="modal-overlay" id="modal-poliza">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-poliza-title">Registrar Póliza</h3>
+        <button class="modal-close" onclick="closeModal('modal-poliza')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="poliza-edit-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>No. Póliza *</label>
+            <input type="text" id="poliza-numero" placeholder="Auto-generado" readonly />
+          </div>
+          <div class="form-group">
+            <label>Cliente *</label>
+            <select id="poliza-cliente" onchange="fillPolizaVehiculos()">
+              <option value="">— Seleccione cliente —</option>
             </select>
           </div>
-          <div class="form-group"><label>Valor mensual ($)</label><input type="number" placeholder="180000" id="p-valor"/></div>
-          <div class="form-group"><label>Fecha inicio</label><input type="date" id="p-inicio"/></div>
-          <div class="form-group"><label>Fecha vencimiento</label><input type="date" id="p-fin"/></div>
         </div>
-        <div class="form-actions">
-          <button class="btn btn-accent" onclick="registrarPoliza()">Crear póliza</button>
-          <button class="btn btn-outline" style="background:rgba(245,166,35,0.1);border-color:var(--warning);color:var(--warning)" onclick="showToast('Póliza renovada exitosamente 🔄')">Renovar</button>
-        </div>
-      </div>
-
-      <div class="table-wrapper">
-        <div class="table-header">
-          <h3>Pólizas activas</h3>
-          <div class="search-box">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="var(--gray)" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="var(--gray)" stroke-width="2"/></svg>
-            <input type="text" placeholder="Buscar..." oninput="filtrarTabla(this,'tabla-polizas')"/>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Vehículo *</label>
+            <select id="poliza-vehiculo">
+              <option value="">— Primero seleccione cliente —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo de Seguro *</label>
+            <select id="poliza-tipo">
+              <option>Todo Riesgo</option>
+              <option>Básico SOAT</option>
+              <option>Pérdida Total</option>
+              <option>Responsabilidad Civil</option>
+              <option>Robo y Hurto</option>
+            </select>
           </div>
         </div>
-        <table id="tabla-polizas">
-          <thead><tr><th>No. Póliza</th><th>Placa</th><th>Cobertura</th><th>Vence</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr><td>POL-2024-001</td><td>ABC-123</td><td>Todo riesgo</td><td>Mar 2026</td><td><span class="badge badge-success">Activa</span></td></tr>
-            <tr><td>POL-2024-002</td><td>XYZ-789</td><td>SOAT</td><td>Jun 2025</td><td><span class="badge badge-warning">Por vencer</span></td></tr>
-            <tr><td>POL-2023-015</td><td>DEF-456</td><td>Resp. civil</td><td>Ene 2025</td><td><span class="badge badge-danger">Vencida</span></td></tr>
-          </tbody>
-        </table>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha Inicio *</label>
+            <input type="date" id="poliza-inicio" />
+          </div>
+          <div class="form-group">
+            <label>Fecha Vencimiento *</label>
+            <input type="date" id="poliza-fin" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prima Mensual (COP) *</label>
+            <input type="number" id="poliza-prima" placeholder="Ej. 150000" />
+          </div>
+          <div class="form-group">
+            <label>Cobertura Máxima (COP)</label>
+            <input type="number" id="poliza-cobertura" placeholder="Ej. 50000000" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="poliza-estado">
+            <option>Activa</option>
+            <option>Cancelada</option>
+            <option>Vencida</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea id="poliza-obs" rows="3" placeholder="Notas adicionales…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-poliza')">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarPoliza()">Guardar Póliza</button>
       </div>
     </div>
-  </section>
-</div>
+  </div>
 
-<!-- ════════════════════ PAGE: PAGOS ════════════════════ -->
-<div class="page" id="page-pagos">
-  <section>
-    <div class="section-label">Módulo</div>
-    <h2 class="section-title">Registro de Pagos</h2>
-    <p class="section-sub">Registra y controla todos los pagos realizados por los asegurados.</p>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
-      <div class="form-section">
-        <h3 class="form-title">Registrar pago</h3>
-        <p class="form-sub">Registra el pago de una cuota o póliza</p>
-        <div class="form-grid">
-          <div class="form-group span2"><label>Número de póliza</label><input type="text" placeholder="POL-2024-001" id="pg-poliza"/></div>
-          <div class="form-group span2"><label>Cédula del cliente</label><input type="text" placeholder="1001234567" id="pg-cliente"/></div>
-          <div class="form-group"><label>Fecha de pago</label><input type="date" id="pg-fecha"/></div>
-          <div class="form-group"><label>Monto ($)</label><input type="number" placeholder="180000" id="pg-monto"/></div>
-          <div class="form-group span2"><label>Método de pago</label>
-            <select id="pg-metodo">
-              <option value="">Seleccionar...</option>
-              <option>Transferencia bancaria</option>
+  <!-- Modal Pago -->
+  <div class="modal-overlay" id="modal-pago">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Registrar Pago</h3>
+        <button class="modal-close" onclick="closeModal('modal-pago')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Póliza *</label>
+          <select id="pago-poliza">
+            <option value="">— Seleccione póliza —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Monto (COP) *</label>
+            <input type="number" id="pago-monto" placeholder="Ej. 150000" />
+          </div>
+          <div class="form-group">
+            <label>Fecha de Pago *</label>
+            <input type="date" id="pago-fecha" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Método de Pago</label>
+            <select id="pago-metodo">
               <option>Efectivo</option>
-              <option>Tarjeta de crédito</option>
-              <option>Tarjeta débito</option>
+              <option>Transferencia</option>
+              <option>Tarjeta Crédito</option>
+              <option>Tarjeta Débito</option>
               <option>PSE</option>
               <option>Nequi / Daviplata</option>
             </select>
           </div>
-          <div class="form-group span2"><label>Comprobante / Referencia</label><input type="text" placeholder="REF-2024-00012" id="pg-ref"/></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-accent" onclick="registrarPago()">Registrar pago</button>
-          <button class="btn btn-outline" onclick="limpiarForm(['pg-poliza','pg-cliente','pg-monto','pg-ref'])">Limpiar</button>
-        </div>
-      </div>
-
-      <div class="table-wrapper">
-        <div class="table-header">
-          <h3>Historial de pagos</h3>
-          <div class="search-box">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="var(--gray)" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="var(--gray)" stroke-width="2"/></svg>
-            <input type="text" placeholder="Buscar..." oninput="filtrarTabla(this,'tabla-pagos')"/>
+          <div class="form-group">
+            <label>Concepto</label>
+            <select id="pago-concepto">
+              <option>Prima mensual</option>
+              <option>Prima anual</option>
+              <option>Renovación</option>
+              <option>Cuota pendiente</option>
+              <option>Otro</option>
+            </select>
           </div>
         </div>
-        <table id="tabla-pagos">
-          <thead><tr><th>Fecha</th><th>Póliza</th><th>Monto</th><th>Método</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr><td>15/01/2025</td><td>POL-2024-001</td><td>$180.000</td><td>PSE</td><td><span class="badge badge-success">Pagado</span></td></tr>
-            <tr><td>10/02/2025</td><td>POL-2024-002</td><td>$95.000</td><td>Nequi</td><td><span class="badge badge-success">Pagado</span></td></tr>
-            <tr><td>05/03/2025</td><td>POL-2023-015</td><td>$210.000</td><td>Transferencia</td><td><span class="badge badge-warning">Pendiente</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- ════════════════════ PAGE: REPORTES ════════════════════ -->
-<div class="page" id="page-reportes">
-  <section>
-    <div class="section-label">Módulo</div>
-    <h2 class="section-title">Reportes y Estadísticas</h2>
-    <p class="section-sub">Consulta el resumen general del sistema y el historial de seguros por cliente.</p>
-
-    <!-- MÉTRICAS -->
-    <div class="dash-grid">
-      <div class="metric-card">
-        <p>Pólizas activas</p>
-        <h2>2,401</h2>
-        <small>↑ 12% este mes</small>
-      </div>
-      <div class="metric-card">
-        <p>Clientes registrados</p>
-        <h2>1,834</h2>
-        <small>↑ 8% este mes</small>
-      </div>
-      <div class="metric-card">
-        <p>Pagos recibidos</p>
-        <h2>$42M</h2>
-        <small>↑ 5% este mes</small>
-      </div>
-      <div class="metric-card">
-        <p>Pólizas por vencer</p>
-        <h2 style="color:var(--warning)">47</h2>
-        <small style="color:var(--warning)">Requieren atención</small>
-      </div>
-    </div>
-
-    <!-- HISTORIAL POR CLIENTE -->
-    <div class="form-section" style="margin-bottom:2rem;max-width:500px">
-      <h3 class="form-title">Historial de seguros por cliente</h3>
-      <p class="form-sub">Ingresa la cédula del cliente para consultar su historial</p>
-      <div style="display:flex;gap:0.75rem;align-items:flex-end">
-        <div class="form-group" style="flex:1">
-          <label>Cédula del cliente</label>
-          <input type="text" placeholder="1001234567" id="hist-cedula"/>
+        <div class="form-group">
+          <label>Referencia / Comprobante</label>
+          <input type="text" id="pago-referencia" placeholder="Ej. TRF-20250101-001" />
         </div>
-        <button class="btn btn-accent" onclick="consultarHistorial()">Consultar</button>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-pago')">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarPago()">Registrar Pago</button>
       </div>
     </div>
-
-    <div class="table-wrapper">
-      <div class="table-header">
-        <h3>Historial — Ana Gómez (1001234567)</h3>
-        <button class="btn btn-outline" onclick="showToast('Reporte exportado en PDF 📄')">Exportar PDF</button>
-      </div>
-      <table>
-        <thead><tr><th>Póliza</th><th>Vehículo</th><th>Cobertura</th><th>Vigencia</th><th>Estado</th></tr></thead>
-        <tbody>
-          <tr><td>POL-2024-001</td><td>ABC-123 Toyota</td><td>Todo riesgo</td><td>Mar 2024 – Mar 2026</td><td><span class="badge badge-success">Activa</span></td></tr>
-          <tr><td>POL-2022-034</td><td>ABC-123 Toyota</td><td>SOAT</td><td>Mar 2022 – Mar 2024</td><td><span class="badge badge-danger">Vencida</span></td></tr>
-          <tr><td>POL-2020-012</td><td>GHI-999 Renault</td><td>Básico</td><td>Ene 2020 – Ene 2022</td><td><span class="badge badge-danger">Vencida</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-</div>
-
-<!-- ════════════════════ FOOTER ════════════════════ -->
-<footer>
-  <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path d="M3 12L5 6h14l2 6M3 12v5h2v2h2v-2h10v2h2v-2h2v-5H3z" stroke="#0B1F3A" stroke-width="1.8" stroke-linejoin="round"/>
-        <circle cx="7.5" cy="14.5" r="1.5" fill="#0B1F3A"/>
-        <circle cx="16.5" cy="14.5" r="1.5" fill="#0B1F3A"/>
-      </svg>
-    </div>
-    <span class="logo-text">Drive<span>Shield</span></span>
   </div>
-  <p>© 2025 DriveShield · Seguros de vehículos · Proyecto universitario — Metodología Scrum</p>
-  <p style="font-size:0.75rem">Sistema disponible 24/7 · Seguro · Confiable</p>
-</footer>
 
-<!-- TOAST -->
-<div class="toast" id="toast">✅ <span id="toast-msg">Registro exitoso</span></div>
+  <!-- Modal Renovar Póliza -->
+  <div class="modal-overlay" id="modal-renovar">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Renovar Póliza</h3>
+        <button class="modal-close" onclick="closeModal('modal-renovar')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Póliza a Renovar</label>
+          <input type="text" id="renovar-info" readonly />
+          <input type="hidden" id="renovar-id" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nueva Fecha Inicio *</label>
+            <input type="date" id="renovar-inicio" />
+          </div>
+          <div class="form-group">
+            <label>Nueva Fecha Vencimiento *</label>
+            <input type="date" id="renovar-fin" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Nueva Prima (COP)</label>
+          <input type="number" id="renovar-prima" placeholder="Dejar vacío para mantener actual" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-renovar')">Cancelar</button>
+        <button class="btn btn-success" onclick="confirmarRenovar()">Renovar Póliza</button>
+      </div>
+    </div>
+  </div>
 
-<script>
-  // ─── NAVEGACIÓN ───
-  const pages = ['home','login','clientes','vehiculos','polizas','pagos','reportes'];
+  <!-- Modal Ver Detalle -->
+  <div class="modal-overlay" id="modal-detalle">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-detalle-title">Detalle</h3>
+        <button class="modal-close" onclick="closeModal('modal-detalle')">✕</button>
+      </div>
+      <div class="modal-body" id="modal-detalle-body">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-detalle')">Cerrar</button>
+      </div>
+    </div>
+  </div>
 
-  function showPage(name) {
-    pages.forEach(p => {
-      document.getElementById('page-'+p).classList.remove('active');
-      const navLink = document.getElementById('nav-'+p);
-      if (navLink) navLink.classList.remove('active');
-    });
-    document.getElementById('page-'+name).classList.add('active');
-    const navLink = document.getElementById('nav-'+name);
-    if (navLink) navLink.classList.add('active');
-    window.scrollTo(0, 0);
-  }
+  </div><!-- /app-wrapper -->
 
-  // ─── LOGIN ───
-  function doLogin() {
-    const u = document.getElementById('login-user').value.trim();
-    const p = document.getElementById('login-pass').value;
-    const err = document.getElementById('login-error');
-    if ((u === 'admin' || u === 'admin@driveshield.com') && p === '1234') {
-      err.style.display = 'none';
-      showPage('home');
-      showToast('Sesión iniciada correctamente ✅');
-    } else {
-      err.textContent = 'Usuario o contraseña incorrectos. Usa admin / 1234';
-      err.style.display = 'block';
-    }
-  }
-
-  // ─── TOAST ───
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toast-msg').textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
-
-  // ─── REGISTROS ───
-  function registrarCliente() {
-    const n = document.getElementById('c-nombre').value.trim();
-    const a = document.getElementById('c-apellido').value.trim();
-    const ced = document.getElementById('c-cedula').value.trim();
-    const ciu = document.getElementById('c-ciudad').value.trim();
-    if (!n || !a || !ced) { showToast('⚠️ Completa los campos obligatorios'); return; }
-    const tbody = document.querySelector('#tabla-clientes tbody');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${n} ${a}</td><td>${ced}</td><td>${ciu||'—'}</td><td><span class="badge badge-success">Activo</span></td>`;
-    tbody.appendChild(tr);
-    limpiarForm(['c-nombre','c-apellido','c-cedula','c-fecha','c-email','c-tel','c-ciudad','c-dir']);
-    showToast('Cliente registrado exitosamente ✅');
-  }
-
-  function registrarVehiculo() {
-    const placa = document.getElementById('v-placa').value.trim();
-    const tipo  = document.getElementById('v-tipo').value;
-    const marca = document.getElementById('v-marca').value.trim();
-    const modelo= document.getElementById('v-modelo').value.trim();
-    const year  = document.getElementById('v-year').value;
-    if (!placa || !tipo || !marca) { showToast('⚠️ Completa los campos obligatorios'); return; }
-    const tbody = document.querySelector('#tabla-vehiculos tbody');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${placa.toUpperCase()}</td><td>${tipo}</td><td>${marca} ${modelo}</td><td>${year}</td>`;
-    tbody.appendChild(tr);
-    limpiarForm(['v-placa','v-marca','v-modelo','v-year','v-color','v-chasis','v-prop']);
-    showToast('Vehículo registrado exitosamente ✅');
-  }
-
-  function registrarPoliza() {
-    const num   = document.getElementById('p-num').value.trim();
-    const placa = document.getElementById('p-placa').value.trim();
-    const tipo  = document.getElementById('p-tipo').value;
-    const fin   = document.getElementById('p-fin').value;
-    if (!num || !placa || !tipo) { showToast('⚠️ Completa los campos obligatorios'); return; }
-    const tbody = document.querySelector('#tabla-polizas tbody');
-    const tr = document.createElement('tr');
-    const vence = fin ? new Date(fin).toLocaleDateString('es-CO',{month:'short',year:'numeric'}) : '—';
-    tr.innerHTML = `<td>${num}</td><td>${placa.toUpperCase()}</td><td>${tipo}</td><td>${vence}</td><td><span class="badge badge-success">Activa</span></td>`;
-    tbody.appendChild(tr);
-    limpiarForm(['p-num','p-cliente','p-placa','p-valor']);
-    showToast('Póliza creada exitosamente ✅');
-  }
-
-  function registrarPago() {
-    const pol   = document.getElementById('pg-poliza').value.trim();
-    const monto = document.getElementById('pg-monto').value;
-    const fecha = document.getElementById('pg-fecha').value;
-    const met   = document.getElementById('pg-metodo').value;
-    if (!pol || !monto || !met) { showToast('⚠️ Completa los campos obligatorios'); return; }
-    const tbody = document.querySelector('#tabla-pagos tbody');
-    const tr = document.createElement('tr');
-    const f = fecha ? new Date(fecha+'T12:00').toLocaleDateString('es-CO') : '—';
-    tr.innerHTML = `<td>${f}</td><td>${pol}</td><td>$${Number(monto).toLocaleString('es-CO')}</td><td>${met}</td><td><span class="badge badge-success">Pagado</span></td>`;
-    tbody.appendChild(tr);
-    limpiarForm(['pg-poliza','pg-cliente','pg-monto','pg-ref']);
-    showToast('Pago registrado exitosamente ✅');
-  }
-
-  function consultarHistorial() {
-    const ced = document.getElementById('hist-cedula').value.trim();
-    if (!ced) { showToast('⚠️ Ingresa una cédula'); return; }
-    showToast('Historial consultado para cédula: ' + ced);
-  }
-
-  // ─── UTILIDADES ───
-  function limpiarForm(ids) {
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-  }
-
-  function filtrarTabla(input, tableId) {
-    const term = input.value.toLowerCase();
-    const rows = document.querySelectorAll('#'+tableId+' tbody tr');
-    rows.forEach(r => {
-      r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
-    });
-  }
-
-  // ─── HAMBURGER ───
-  document.getElementById('hamburger').addEventListener('click', function() {
-    const menu = document.getElementById('nav-menu');
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    menu.style.flexDirection = 'column';
-    menu.style.position = 'absolute';
-    menu.style.top = '72px';
-    menu.style.left = '0'; menu.style.right = '0';
-    menu.style.background = 'var(--navy)';
-    menu.style.padding = '1rem 2rem';
-    menu.style.borderBottom = '1px solid var(--card-border)';
-  });
-
-  // Retorna al estilo normal en desktop
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 900) {
-      const menu = document.getElementById('nav-menu');
-      menu.removeAttribute('style');
-    }
-  });
-</script>
+  <script src="app.js"></script>
 </body>
 </html>
