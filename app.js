@@ -1,13 +1,4 @@
-/* =====================================================
-   DRIVERSHIELD — LÓGICA PRINCIPAL
-   Almacenamiento: localStorage
-   ===================================================== */
-
 "use strict";
-
-// ──────────────────────────────────────────────────────
-// AUTH — USUARIOS
-// ──────────────────────────────────────────────────────
 const USERS_KEY = 'ds_usuarios';
 const SESSION_KEY = 'ds_session';
 
